@@ -16,6 +16,8 @@ from nltk.sentiment.vader import SentimentIntensityAnalyzer
 import nltk
 import string
 from nltk.corpus import stopwords
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 # Download NLTK resources
 nltk.download('stopwords')
@@ -168,7 +170,7 @@ def open_main_window():
     window_width = 800
     window_height = 400
 
-    image = Image.open("assets/background_image.png")
+    image = Image.open("background_image.png")
     image = image.resize((window_width, window_height))
     photo = ImageTk.PhotoImage(image)
 
@@ -204,6 +206,14 @@ def display_comments(comments_df, article_title):
     window = tk.Toplevel()
     window.title(article_title)
 
+    # Create Frame for the button and treeview
+    frame = tk.Frame(window)
+    frame.pack(pady=10)
+
+    # Create a button to show statistics
+    stats_button = tk.Button(frame, text="Statistics", command=lambda: show_statistics(comments_df))
+    stats_button.pack(side="left", padx=10)
+
     # Create Treeview widget to display comments
     tree = ttk.Treeview(window, columns=["User Name", "Date", "Comment", "Sentiment", "Sentiment Score"], show="headings")
     tree.heading("User Name", text="User Name")
@@ -224,6 +234,114 @@ def display_comments(comments_df, article_title):
     tree.configure(yscroll=scrollbar.set)
     scrollbar.pack(side="right", fill="y")
     tree.pack(fill="both", expand=True)
+
+
+
+
+
+
+def show_statistics(comments_df):
+    # Create a new window for displaying statistics
+    stats_window = tk.Toplevel()
+    stats_window.title("Statistics")
+    stats_window.geometry("800x600")  # Adjust window size
+
+    # Create a frame to contain all the statistics and visualizations
+    frame = tk.Frame(stats_window)
+    frame.pack(fill=tk.BOTH, expand=True)
+
+    # Create a canvas within the frame to enable scrolling
+    canvas = tk.Canvas(frame)
+    canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+    # Add a scrollbar to the canvas
+    scrollbar = tk.Scrollbar(frame, orient=tk.VERTICAL, command=canvas.yview)
+    scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+    canvas.configure(yscrollcommand=scrollbar.set)
+
+    # Function to resize the canvas scroll region
+    def resize(event):
+        canvas.configure(scrollregion=canvas.bbox("all"))
+
+    # Bind the resize function to the canvas
+    canvas.bind("<Configure>", resize)
+
+    # Create a frame on the canvas to contain all the widgets
+    inner_frame = tk.Frame(canvas)
+    canvas.create_window((0, 0), window=inner_frame, anchor=tk.NW)
+
+    # Calculate various statistics
+    total_comments = len(comments_df)
+    positive_comments = comments_df[comments_df['Sentiment'] == 'Positive']
+    negative_comments = comments_df[comments_df['Sentiment'] == 'Negative']
+    neutral_comments = comments_df[comments_df['Sentiment'] == 'Neutral']
+    avg_sentiment_score = comments_df['Sentiment Score'].mean()
+
+    # Create labels to display statistics
+    tk.Label(inner_frame, text="Total Comments: " + str(total_comments)).pack(anchor=tk.W)
+    tk.Label(inner_frame, text="Positive Comments: " + str(len(positive_comments))).pack(anchor=tk.W)
+    tk.Label(inner_frame, text="Negative Comments: " + str(len(negative_comments))).pack(anchor=tk.W)
+    tk.Label(inner_frame, text="Neutral Comments: " + str(len(neutral_comments))).pack(anchor=tk.W)
+    tk.Label(inner_frame, text="Average Sentiment Score: " + str(avg_sentiment_score)).pack(anchor=tk.W)
+
+    # Create different types of visualizations
+    create_bar_plot(inner_frame, comments_df)
+
+    # Update the canvas scroll region
+    canvas.update_idletasks()
+    canvas.config(scrollregion=canvas.bbox("all"))
+
+
+def create_bar_plot(stats_window, comments_df):
+    # Create a frame to contain both the bar plot and line plot
+    plot_frame = tk.Frame(stats_window)
+    plot_frame.pack()
+
+    # Create a bar plot to visualize sentiment distribution
+    sentiment_counts = comments_df['Sentiment'].value_counts()
+    plt.figure(figsize=(4, 3))
+    sns.barplot(x=sentiment_counts.index, y=sentiment_counts.values)
+    plt.title('Sentiment Distribution')
+    plt.xlabel('Sentiment')
+    plt.ylabel('Count')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.savefig('sentiment_distribution.png')
+
+    # Display the bar plot
+    plot_image = Image.open('sentiment_distribution.png')
+    plot_photo = ImageTk.PhotoImage(plot_image)
+    plot_label = tk.Label(plot_frame, image=plot_photo)
+    plot_label.image = plot_photo
+    plot_label.grid(row=0, column=0, padx=10, pady=10)
+
+    # Create a line plot to visualize the number of comments over time
+    comments_df['Date'] = pd.to_datetime(comments_df['Date'])
+    comments_by_date = comments_df.groupby(comments_df['Date'].dt.date).size()
+    plt.figure(figsize=(4, 3))
+    plt.plot(comments_by_date.index, comments_by_date.values, marker='o', linestyle='-')
+    plt.title('Number of Comments over Time')
+    plt.xlabel('Date')
+    plt.ylabel('Number of Comments')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.savefig('comments_over_time.png')
+
+    # Display the line plot
+    plot_image = Image.open('comments_over_time.png')
+    plot_photo = ImageTk.PhotoImage(plot_image)
+    plot_label = tk.Label(plot_frame, image=plot_photo)
+    plot_label.image = plot_photo
+    plot_label.grid(row=1, column=0, padx=10, pady=10)
+
+
+
+
+
+
+
+
+
 
 
 open_main_window()
