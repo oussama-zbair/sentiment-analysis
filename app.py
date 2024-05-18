@@ -19,6 +19,7 @@ nltk.download('vader_lexicon')
 
 app = Flask(__name__)
 
+
 def is_valid_url(url):
     try:
         result = urlparse(url)
@@ -26,12 +27,14 @@ def is_valid_url(url):
     except ValueError:
         return False
 
+
 def arabic_to_english_month(arabic_month):
     months_arabic = ['يناير', 'فبراير', 'مارس', 'أبريل', 'ماي', 'يونيو', 'يوليوز', 'غشت', 'شتنبر', 'أكتوبر', 'نونبر',
                      'دجنبر']
     months_english = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October',
                       'November', 'December']
     return months_english[months_arabic.index(arabic_month)]
+
 
 def fetch_comments(url):
     user_name = []
@@ -75,6 +78,7 @@ def fetch_comments(url):
     df = pd.DataFrame({'User Name': user_name, 'Comment': comment_text, 'Date': comment_date})
     return df, article_title
 
+
 def analyze_sentiment(comment):
     sid = SentimentIntensityAnalyzer()
     arabic_stopwords = set(stopwords.words('arabic'))
@@ -99,6 +103,7 @@ def analyze_sentiment(comment):
     else:
         return 'Neutral', compound_score
 
+
 def create_bar_plot(comments_df):
     sentiment_counts = comments_df['Sentiment'].value_counts()
     plt.figure(figsize=(8, 6))
@@ -109,6 +114,7 @@ def create_bar_plot(comments_df):
     plt.xticks(rotation=45)
     plt.tight_layout()
     plt.savefig('static/images/sentiment_distribution.png')
+
 
 def create_time_series_plot(comments_df):
     comments_df['Date'] = pd.to_datetime(comments_df['Date'], errors='coerce')
@@ -123,9 +129,11 @@ def create_time_series_plot(comments_df):
     plt.tight_layout()
     plt.savefig('static/images/comments_over_time.png')
 
+
 @app.route('/')
 def index():
     return render_template('index.html')
+
 
 @app.route('/display', methods=['GET', 'POST'])
 def display():
@@ -146,6 +154,7 @@ def display():
             return render_template('index.html', error=error)
     return redirect(url_for('index'))
 
+
 @app.route('/statistics')
 def statistics():
     comments_df = pd.read_csv('comments.csv')
@@ -162,5 +171,6 @@ def statistics():
                            neutral_comments=neutral_comments,
                            avg_sentiment_score=avg_sentiment_score)
 
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False, host='0.0.0.0')
