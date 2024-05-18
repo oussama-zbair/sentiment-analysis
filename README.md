@@ -13,10 +13,17 @@ Welcome to the Sentiment Analysis app! This tool allows you to analyze the senti
 To get started with the app, follow these steps:
 
 1. Clone the repository to your local machine.
-2. Install the required dependencies by running `pip install -r requirements.txt`.
-3. Run the Flask web server by executing `python app.py`.
-4. Access the web app in your browser at `http://localhost:5000`.
-5. Enter the URL of a Hespress article in the input field and click "Fetch and Analyze Comments".
+   **Clone the repository to your local machine:**
+   ```bash
+   git clone https://github.com/your-username/sentiment-analysis.git
+   ```
+2. Install the required dependencies by running
+   ```bash
+   pip install -r requirements.txt`
+   ```
+4. Run the Flask web server by executing `python app.py`.
+5. Access the web app in your browser at `http://localhost:5000`.
+6. Enter the URL of a Hespress article in the input field and click "Fetch and Analyze Comments".
 
 ## Usage
 
