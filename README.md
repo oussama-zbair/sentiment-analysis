@@ -6,7 +6,7 @@ This web application allows users to analyze the sentiment of comments on Hespre
 
 ## Introduction
 
-Welcome to the Sentiment Analysis app! This tool allows you to analyze the sentiment of comments on Hespress articles. You can fetch comments from a Hespress article and analyze their sentiment to classify them as positive, negative, or neutral.
+This tool allows you to analyze the sentiment of comments on Hespress articles. You can fetch comments from a Hespress article and analyze their sentiment to classify them as positive, negative, or neutral.
 
 ## Getting Started
 
@@ -21,9 +21,9 @@ To get started with the app, follow these steps:
    ```bash
    pip install -r requirements.txt`
    ```
-4. Run the Flask web server by executing `python app.py`.
-5. Access the web app in your browser at `http://localhost:5000`.
-6. Enter the URL of a Hespress article in the input field and click "Fetch and Analyze Comments".
+3. Run the Flask web server by executing `python app.py`.
+4. Access the web app in your browser at `http://localhost:5000`.
+5. Enter the URL of a Hespress article in the input field and click "Fetch and Analyze Comments".
 
 ## Usage
 
