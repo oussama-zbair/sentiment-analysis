@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentiment Analysis on Hespress Comments</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Sentiment Analysis on Hespress Comments</h1>
+    </header>
+    <main>
+        <section id="introduction">
+            <h2>Introduction</h2>
+            <p>Welcome to the Sentiment Analysis app! This tool allows you to analyze the sentiment of comments on Hespress articles. You can fetch comments from a Hespress article and analyze their sentiment to classify them as positive, negative, or neutral.</p>
+        </section>
+        <section id="get-started">
+            <h2>Get Started</h2>
+            <form action="{{ url_for('display') }}" method="post" class="form">
+                <label for="url">Enter Hespress URL:</label>
+                <input type="text" id="url" name="url" required>
+                <button type="submit">Fetch and Analyze Comments</button>
+                {% if error %}
+                <p class="error">{{ error }}</p>
+                {% endif %}
+            </form>
+            <p>Tutorial: Enter the URL of a Hespress article in the input field above and click "Fetch and Analyze Comments" to see the sentiment analysis results.</p>
+        </section>
+    </main>
+</body>
+</html>

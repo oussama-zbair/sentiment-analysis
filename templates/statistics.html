@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Statistics</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Sentiment Analysis Statistics</h1>
+    </header>
+    <main>
+        <section id="statistics">
+            <h2>Statistics Overview</h2>
+            <p>Total Comments: {{ total_comments }}</p>
+            <p>Positive Comments: {{ positive_comments }}</p>
+            <p>Negative Comments: {{ negative_comments }}</p>
+            <p>Neutral Comments: {{ neutral_comments }}</p>
+            <p>Average Sentiment Score: {{ avg_sentiment_score }}</p>
+        </section>
+        <section id="diagrams">
+            <h2>Sentiment Distribution</h2>
+            <img src="{{ url_for('static', filename='images/sentiment_distribution.png') }}" alt="Sentiment Distribution">
+            <h2>Number of Comments Over Time</h2>
+            <img src="{{ url_for('static', filename='images/comments_over_time.png') }}" alt="Number of Comments Over Time">
+        </section>
+    </main>
+</body>
+</html>

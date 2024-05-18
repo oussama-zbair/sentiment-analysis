@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sentiment Analysis Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Sentiment Analysis Results for "{{ article_title }}"</h1>
+    </header>
+    <main>
+        <section id="results">
+            <h2>Analysis Results</h2>
+            <div class="table-container">
+                {% for table in tables %}
+                {{ table|safe }}
+                {% endfor %}
+            </div>
+            <a class="btn" href="{{ url_for('statistics') }}">View Statistics</a>
+            <a class="btn" href="{{ url_for('index') }}">Analyze Another Comment</a>
+
+        </section>
+    </main>
+</body>
+</html>
