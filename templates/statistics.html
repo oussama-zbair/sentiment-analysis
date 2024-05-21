@@ -7,6 +7,7 @@
 </head>
 <body>
     <header>
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
         <h1>Sentiment Analysis Statistics</h1>
     </header>
     <main>
@@ -20,7 +21,9 @@
         </section>
         <section id="diagrams">
             <h2>Sentiment Distribution</h2>
-            <img src="{{ url_for('static', filename='images/sentiment_distribution.png') }}" alt="Sentiment Distribution">
+            <img src="{{ url_for('static', filename='images/sentiment_distribution_pie.png') }}" alt="Sentiment Distribution">
+            <h2>Likes per User</h2>
+            <img src="{{ url_for('static', filename='images/likes_per_user_bar.png') }}" alt="Likes per User">
             <h2>Number of Comments Over Time</h2>
             <img src="{{ url_for('static', filename='images/comments_over_time.png') }}" alt="Number of Comments Over Time">
         </section>

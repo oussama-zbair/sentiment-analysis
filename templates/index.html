@@ -8,6 +8,7 @@
 </head>
 <body>
     <header>
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
         <h1>Sentiment Analysis on Hespress Comments</h1>
     </header>
     <main>
@@ -19,13 +20,12 @@
             <h2>Get Started</h2>
             <form action="{{ url_for('display') }}" method="post" class="form">
                 <label for="url">Enter Hespress URL:</label>
-                <input type="text" id="url" name="url" required>
-                <button type="submit">Fetch and Analyze Comments</button>
+                <input type="text" id="url" name="url" placeholder="https://www.hespress.com/hespress-article" required>
+                <button type="submit">Analyze Comments</button>
                 {% if error %}
                 <p class="error">{{ error }}</p>
                 {% endif %}
             </form>
-            <p>Tutorial: Enter the URL of a Hespress article in the input field above and click "Fetch and Analyze Comments" to see the sentiment analysis results.</p>
         </section>
     </main>
 </body>

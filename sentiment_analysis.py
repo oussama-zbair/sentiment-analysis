@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 nltk.download('stopwords')
 nltk.download('vader_lexicon')
 
+
 def is_valid_url(url):
     try:
         result = urlparse(url)
@@ -28,6 +29,7 @@ def is_valid_url(url):
     except ValueError:
         return False
 
+
 def arabic_to_english_month(arabic_month):
     months_arabic = ['يناير', 'فبراير', 'مارس', 'أبريل', 'ماي', 'يونيو', 'يوليوز', 'غشت', 'شتنبر', 'أكتوبر', 'نونبر',
                      'دجنبر']
@@ -35,12 +37,15 @@ def arabic_to_english_month(arabic_month):
                       'November', 'December']
     return months_english[months_arabic.index(arabic_month)]
 
+
 def fetch_comments(url):
     user_name = []
     comment_text = []
     comment_date = []
+    likes = []
 
-    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
     data = requests.get(url, headers=headers)
     soup = BeautifulSoup(data.content, "html.parser")
 
@@ -71,12 +76,20 @@ def fetch_comments(url):
                 comment_date.append(pd.Timestamp(year, datetime.strptime(month, '%B').month, day, hour, minute))
             else:
                 comment_date.append('Unknown date')
+
+            likes_span = li.find('span', class_='comment-recat-number')
+            if likes_span:
+                likes.append(int(likes_span.get_text()))
+            else:
+                likes.append(0)  # If no likes found, append 0
+
     else:
         print("No comments found on the page.")
 
-    df = pd.DataFrame({'User Name': user_name, 'Comment': comment_text, 'Date': comment_date})
+    df = pd.DataFrame({'User Name': user_name, 'Comment': comment_text, 'Date': comment_date, 'Likes': likes})
     df.to_csv('comments.csv', index=False)  # Save to CSV
     return df, article_title
+
 
 def analyze_sentiment(comment):
     sid = SentimentIntensityAnalyzer()
@@ -102,41 +115,56 @@ def analyze_sentiment(comment):
     else:
         return 'Neutral', compound_score
 
-def main():
+
+def create_bar_plot(comments_df):
+    sentiment_counts = comments_df['Sentiment'].value_counts()
+    plt.figure(figsize=(8, 6))
+    sns.barplot(x=sentiment_counts.index, y=sentiment_counts.values)
+    plt.title('Sentiment Distribution')
+    plt.xlabel('Sentiment')
+    plt.ylabel('Count')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.savefig('static/images/sentiment_distribution.png')
+
+
+def create_time_series_plot(comments_df):
+    comments_df['Date'] = pd.to_datetime(comments_df['Date'], errors='coerce')
+    comments_df = comments_df.dropna(subset=['Date'])
+    comments_df.set_index('Date', inplace=True)
+    comments_over_time = comments_df.resample('D').size()
+    plt.figure(figsize=(10, 6))
+    comments_over_time.plot()
+    plt.title('Number of Comments Over Time')
+    plt.xlabel('Date')
+    plt.ylabel('Number of Comments')
+    plt.tight_layout()
+    plt.savefig('static/images/comments_over_time.png')
+
+
+if __name__ == "__main__":
     url = input("Enter a valid Hespress URL: ")
     if is_valid_url(url):
         comments_df, article_title = fetch_comments(url)
-        comments_df['Sentiment'], comments_df['Sentiment Score'] = zip(
-            *comments_df['Comment'].apply(analyze_sentiment))
+        comments_df['Sentiment'], comments_df['Sentiment Score'] = zip(*comments_df['Comment'].apply(analyze_sentiment))
         comments_df.to_csv('comments.csv', index=False)  # Save the DataFrame to a CSV file
         print(f"Comments for '{article_title}' have been fetched and analyzed.")
 
         # Statistics
         total_comments = len(comments_df)
-        positive_comments = comments_df[comments_df['Sentiment'] == 'Positive']
-        negative_comments = comments_df[comments_df['Sentiment'] == 'Negative']
-        neutral_comments = comments_df[comments_df['Sentiment'] == 'Neutral']
+        positive_comments = len(comments_df[comments_df['Sentiment'] == 'Positive'])
+        negative_comments = len(comments_df[comments_df['Sentiment'] == 'Negative'])
+        neutral_comments = len(comments_df[comments_df['Sentiment'] == 'Neutral'])
         avg_sentiment_score = comments_df['Sentiment Score'].mean()
 
         print(f"Total Comments: {total_comments}")
-        print(f"Positive Comments: {len(positive_comments)}")
-        print(f"Negative Comments: {len(negative_comments)}")
-        print(f"Neutral Comments: {len(neutral_comments)}")
+        print(f"Positive Comments: {positive_comments}")
+        print(f"Negative Comments: {negative_comments}")
+        print(f"Neutral Comments: {neutral_comments}")
         print(f"Average Sentiment Score: {avg_sentiment_score}")
 
         # Visualization
-        plt.figure(figsize=(10, 6))
-        sns.countplot(x='Sentiment', data=comments_df)
-        plt.title('Sentiment Distribution')
-        plt.show()
-
-        plt.figure(figsize=(10, 6))
-        sns.histplot(comments_df['Sentiment Score'], kde=True)
-        plt.title('Sentiment Score Distribution')
-        plt.show()
-
+        create_bar_plot(comments_df)
+        create_time_series_plot(comments_df)
     else:
         print("Invalid URL. Please enter a valid Hespress URL.")
-
-if __name__ == "__main__":
-    main()
